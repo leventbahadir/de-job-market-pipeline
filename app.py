@@ -49,7 +49,7 @@ col3.metric("Last Updated", str(last_updated['ts'][0])[:16])
 st.subheader("Top trending skills")
 skills_df = pd.read_sql("SELECT skill, job_count, pct_of_total FROM marts.skill_demand ORDER BY job_count DESC LIMIT 15", engine)
 fig1 = px.bar(skills_df, x='job_count', y='skill', orientation='h', color='job_count',
-              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+              color_continuous_scale=[[0, '#ffffff'], [1, '#0066FF']])
 fig1.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
                    paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig1, use_container_width=True)
@@ -79,7 +79,7 @@ companies_df = pd.read_sql("""
     LIMIT 15
 """, engine)
 fig3 = px.bar(companies_df, x='job_count', y='company', orientation='h', color='job_count',
-              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+              color_continuous_scale=[[0, '#ffffff'], [1, '#0066FF']])
 fig3.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
                    paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig3, use_container_width=True)
