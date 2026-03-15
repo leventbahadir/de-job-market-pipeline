@@ -15,7 +15,7 @@ SKILLS = [
 
 def get_connection():
     return psycopg2.connect(
-        host=os.getenv("DB_HOST"),
+        host=os.getenv("DB_HOST_DOCKER"),
         port=os.getenv("DB_PORT"),
         dbname=os.getenv("DB_NAME"),
         user=os.getenv("DB_USER"),
