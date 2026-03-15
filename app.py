@@ -10,10 +10,24 @@ load_dotenv()
 DB_HOST = os.getenv("DB_HOST")
 DB_PORT = os.getenv("DB_PORT")
 DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER")
-DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_USER = os.getenv("DB_USER_SUPABASE")
+DB_PASSWORD = os.getenv("DB_PASSWORD_SUPABASE")
 
-engine = create_engine(f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+#engine = create_engine(f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
+# engine = create_engine(
+#     f"postgresql+psycopg2://"
+#     f"{os.getenv('DB_USER_SUPABASE')}:{os.getenv('DB_PASSWORD_SUPABASE')}"
+#     f"@{os.getenv('DB_HOST_SUPABASE')}:{os.getenv('DB_PORT_SUPABASE')}"
+#     f"/{os.getenv('DB_NAME_SUPABASE')}"
+# )
+#engine = create_engine("postgresql+psycopg2://postgres.utcyllupkvhcccsljutf:Levent2026..@aws-1-us-east-1.pooler.supabase.com:5432/postgres")
+
+engine = create_engine(
+    f"postgresql+psycopg2://"
+    f"{st.secrets['DB_USER_SUPABASE']}:{st.secrets['DB_PASSWORD_SUPABASE']}"
+    f"@{st.secrets['DB_HOST_SUPABASE']}:{st.secrets['DB_PORT_SUPABASE']}"
+    f"/{st.secrets['DB_NAME_SUPABASE']}"
+)
 
 st.set_page_config(page_title="DE Job Market", layout="wide")
 st.title("Data Engineer Job Market Dashboard")
