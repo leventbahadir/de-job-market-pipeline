@@ -64,7 +64,7 @@ location_df = pd.read_sql("""
     LIMIT 15
 """, engine)
 fig2 = px.bar(location_df, x='job_count', y='location', orientation='h', color='job_count',
-              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+              color_continuous_scale=[[0, '#ffffff'], [1, '#0066FF']])
 fig2.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
                    paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig2, use_container_width=True)
