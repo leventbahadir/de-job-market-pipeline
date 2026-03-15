@@ -7,12 +7,6 @@ import os
 
 load_dotenv()
 
-DB_HOST = os.getenv("DB_HOST")
-DB_PORT = os.getenv("DB_PORT")
-DB_NAME = os.getenv("DB_NAME")
-DB_USER = os.getenv("DB_USER_SUPABASE")
-DB_PASSWORD = os.getenv("DB_PASSWORD_SUPABASE")
-
 #engine = create_engine(f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
 # engine = create_engine(
 #     f"postgresql+psycopg2://"
@@ -28,8 +22,20 @@ engine = create_engine(
     f"@{st.secrets['DB_HOST_SUPABASE']}:{st.secrets['DB_PORT_SUPABASE']}"
     f"/{st.secrets['DB_NAME_SUPABASE']}"
 )
-
 st.set_page_config(page_title="DE Job Market", layout="wide")
+
+st.markdown("""
+    <style>
+    iframe { pointer-events: none; }
+    </style>
+    <div style="position:fixed; bottom:30px; right:20px; z-index:999; display:flex; flex-direction:column; gap:8px;">
+        <button onclick="window.scrollTo({top:0, behavior:'smooth'})"
+            style="padding:8px 14px; border-radius:6px; border:1px solid #ccc; cursor:pointer; background:white; font-size:16px;">↑</button>
+        <button onclick="window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'})"
+            style="padding:8px 14px; border-radius:6px; border:1px solid #ccc; cursor:pointer; background:white; font-size:16px;">↓</button>
+    </div>
+""", unsafe_allow_html=True)
+
 st.title("Data Engineer Job Market Dashboard")
 
 col1, col2, col3 = st.columns(3)
