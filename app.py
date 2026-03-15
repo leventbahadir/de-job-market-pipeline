@@ -7,31 +7,29 @@ import os
 
 load_dotenv()
 
-#engine = create_engine(f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}")
-# engine = create_engine(
-#     f"postgresql+psycopg2://"
-#     f"{os.getenv('DB_USER_SUPABASE')}:{os.getenv('DB_PASSWORD_SUPABASE')}"
-#     f"@{os.getenv('DB_HOST_SUPABASE')}:{os.getenv('DB_PORT_SUPABASE')}"
-#     f"/{os.getenv('DB_NAME_SUPABASE')}"
-# )
-
 engine = create_engine(
     f"postgresql+psycopg2://"
     f"{st.secrets['DB_USER_SUPABASE']}:{st.secrets['DB_PASSWORD_SUPABASE']}"
     f"@{st.secrets['DB_HOST_SUPABASE']}:{st.secrets['DB_PORT_SUPABASE']}"
     f"/{st.secrets['DB_NAME_SUPABASE']}"
 )
+
 st.set_page_config(page_title="DE Job Market", layout="wide")
 
 st.markdown("""
     <style>
     iframe { pointer-events: none; }
+    .stApp { background-color: #1a1a1a; }
+    .stApp, .stApp p, .stApp h1, .stApp h2, .stApp h3, .stApp label, .stApp div {
+        color: #f0f0f0;
+    }
+    .stMetric { background-color: #2a2a2a; border-radius: 8px; padding: 12px; }
     </style>
     <div style="position:fixed; bottom:30px; right:20px; z-index:999; display:flex; flex-direction:column; gap:8px;">
         <button onclick="window.scrollTo({top:0, behavior:'smooth'})"
-            style="padding:8px 14px; border-radius:6px; border:1px solid #ccc; cursor:pointer; background:white; font-size:16px;">↑</button>
+            style="padding:8px 14px; border-radius:6px; border:1px solid #555; cursor:pointer; background:#2a2a2a; color:white; font-size:16px;">↑</button>
         <button onclick="window.scrollTo({top:document.body.scrollHeight, behavior:'smooth'})"
-            style="padding:8px 14px; border-radius:6px; border:1px solid #ccc; cursor:pointer; background:white; font-size:16px;">↓</button>
+            style="padding:8px 14px; border-radius:6px; border:1px solid #555; cursor:pointer; background:#2a2a2a; color:white; font-size:16px;">↓</button>
     </div>
 """, unsafe_allow_html=True)
 
@@ -50,8 +48,10 @@ col3.metric("Last Updated", str(last_updated['ts'][0])[:16])
 
 st.subheader("Top trending skills")
 skills_df = pd.read_sql("SELECT skill, job_count, pct_of_total FROM marts.skill_demand ORDER BY job_count DESC LIMIT 15", engine)
-fig1 = px.bar(skills_df, x='job_count', y='skill', orientation='h', color='job_count', color_continuous_scale='blues')
-fig1.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False)
+fig1 = px.bar(skills_df, x='job_count', y='skill', orientation='h', color='job_count',
+              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+fig1.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
+                   paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig1, use_container_width=True)
 
 st.subheader("Jobs by location")
@@ -63,8 +63,10 @@ location_df = pd.read_sql("""
     ORDER BY job_count DESC 
     LIMIT 15
 """, engine)
-fig2 = px.bar(location_df, x='job_count', y='location', orientation='h', color='job_count', color_continuous_scale='teal')
-fig2.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False)
+fig2 = px.bar(location_df, x='job_count', y='location', orientation='h', color='job_count',
+              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+fig2.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
+                   paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig2, use_container_width=True)
 
 st.subheader("Top hiring companies")
@@ -76,6 +78,8 @@ companies_df = pd.read_sql("""
     ORDER BY job_count DESC 
     LIMIT 15
 """, engine)
-fig3 = px.bar(companies_df, x='job_count', y='company', orientation='h', color='job_count', color_continuous_scale='purples')
-fig3.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False)
+fig3 = px.bar(companies_df, x='job_count', y='company', orientation='h', color='job_count',
+              color_continuous_scale=[[0, '#ffffff'], [1, '#ff6600']])
+fig3.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
+                   paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig3, use_container_width=True)
