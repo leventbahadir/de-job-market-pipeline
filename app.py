@@ -14,7 +14,6 @@ load_dotenv()
 #     f"@{os.getenv('DB_HOST_SUPABASE')}:{os.getenv('DB_PORT_SUPABASE')}"
 #     f"/{os.getenv('DB_NAME_SUPABASE')}"
 # )
-#engine = create_engine("postgresql+psycopg2://postgres.utcyllupkvhcccsljutf:Levent2026..@aws-1-us-east-1.pooler.supabase.com:5432/postgres")
 
 engine = create_engine(
     f"postgresql+psycopg2://"
