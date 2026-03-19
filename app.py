@@ -35,9 +35,51 @@ st.markdown("""
 
 st.title("Data Engineer Job Market Stats")
 
+# ── Load filter options ──────────────────────────────────────────────
+locations_df = pd.read_sql("""
+    SELECT DISTINCT location FROM raw.job_postings
+    WHERE location IS NOT NULL ORDER BY location
+""", engine)
+
+titles_df = pd.read_sql("""
+    SELECT DISTINCT title FROM raw.job_postings
+    WHERE title IS NOT NULL ORDER BY title
+""", engine)
+
+# ── Sidebar filters ──────────────────────────────────────────────────
+with st.sidebar:
+    st.header("Filters")
+
+    selected_locations = st.multiselect(
+        "Location",
+        options=locations_df['location'].tolist(),
+        default=[]
+    )
+
+    selected_titles = st.multiselect(
+        "Job Title",
+        options=titles_df['title'].tolist(),
+        default=[]
+    )
+
+# ── Build WHERE clause dynamically ──────────────────────────────────
+def build_where(extra_conditions=None):
+    conditions = []
+    if selected_locations:
+        locs = ", ".join([f"'{l}'" for l in selected_locations])
+        conditions.append(f"location IN ({locs})")
+    if selected_titles:
+        titles = ", ".join([f"'{t}'" for t in selected_titles])
+        conditions.append(f"title IN ({titles})")
+    if extra_conditions:
+        conditions.extend(extra_conditions)
+    return "WHERE " + " AND ".join(conditions) if conditions else ""
+
+# ── Metrics ──────────────────────────────────────────────────────────
 col1, col2, col3 = st.columns(3)
 
-total = pd.read_sql("SELECT COUNT(*) as count FROM raw.job_postings", engine)
+where = build_where(["1=1"])
+total = pd.read_sql(f"SELECT COUNT(*) as count FROM raw.job_postings {build_where()}", engine)
 col1.metric("Total Jobs Tracked", total['count'][0])
 
 top_skill = pd.read_sql("SELECT skill FROM marts.skill_demand ORDER BY job_count DESC LIMIT 1", engine)
@@ -46,19 +88,25 @@ col2.metric("Top Skill", top_skill['skill'][0])
 last_updated = pd.read_sql("SELECT MAX(ingested_at) as ts FROM raw.job_postings", engine)
 col3.metric("Last Updated", str(last_updated['ts'][0])[:16])
 
+# ── Skills chart ─────────────────────────────────────────────────────
 st.subheader("Top trending skills")
-skills_df = pd.read_sql("SELECT skill, job_count, pct_of_total FROM marts.skill_demand ORDER BY job_count DESC LIMIT 15", engine)
+skills_df = pd.read_sql("""
+    SELECT skill, job_count, pct_of_total 
+    FROM marts.skill_demand 
+    ORDER BY job_count DESC LIMIT 15
+""", engine)
 fig1 = px.bar(skills_df, x='job_count', y='skill', orientation='h', color='job_count',
               color_continuous_scale=[[0, '#ffffff'], [1, '#0066FF']])
 fig1.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
                    paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig1, use_container_width=True)
 
+# ── Location chart ───────────────────────────────────────────────────
 st.subheader("Jobs by location")
-location_df = pd.read_sql("""
+location_df = pd.read_sql(f"""
     SELECT location, COUNT(*) as job_count 
     FROM raw.job_postings 
-    WHERE location IS NOT NULL 
+    {build_where(["location IS NOT NULL"])}
     GROUP BY location 
     ORDER BY job_count DESC 
     LIMIT 15
@@ -69,11 +117,12 @@ fig2.update_layout(yaxis={'categoryorder':'total ascending'}, showlegend=False,
                    paper_bgcolor='#1a1a1a', plot_bgcolor='#1a1a1a', font_color='#f0f0f0')
 st.plotly_chart(fig2, use_container_width=True)
 
+# ── Companies chart ──────────────────────────────────────────────────
 st.subheader("Top hiring companies")
-companies_df = pd.read_sql("""
+companies_df = pd.read_sql(f"""
     SELECT company, COUNT(*) as job_count 
     FROM raw.job_postings 
-    WHERE company IS NOT NULL 
+    {build_where(["company IS NOT NULL"])}
     GROUP BY company 
     ORDER BY job_count DESC 
     LIMIT 15
